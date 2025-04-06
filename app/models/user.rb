@@ -1,6 +1,8 @@
 class User < ApplicationRecord
   has_secure_password
 
+  has_many :expenses, dependent: :destroy
+
   VALID_EMAIL_REGEX = /\A[^@\s]+@[^@\s]+\z/
 
   validates :name, presence: true
