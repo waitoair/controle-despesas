@@ -17,4 +17,6 @@ Rails.application.routes.draw do
   get "/me", to: "sessions#show"
 
   resources :expenses, only: %i[index create update destroy]
+
+  get "/dashboard", to: "dashboard#show"
 end
