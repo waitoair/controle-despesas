@@ -1,3 +1,5 @@
+require "csv"
+
 class ExpensesController < ApplicationController
   before_action :require_login
   before_action :set_expense, only: %i[update destroy]
@@ -24,17 +26,28 @@ class ExpensesController < ApplicationController
 
     expenses = expenses.order(expense_date: :desc)
 
-    pagy, paginated_expenses = pagy(expenses, items: params[:per_page] || 10)
+    respond_to do |format|
+      format.json do
+        pagy, paginated_expenses = pagy(expenses, items: params[:per_page] || 10)
+        render json: {
+          data: paginated_expenses,
+          meta: {
+            current_page: pagy.page,
+            per_page: pagy.vars[:items],
+            total_count: pagy.count,
+            total_pages: pagy.pages
+          }
+        }
+      end
 
-    render json: {
-      data: paginated_expenses,
-      meta: {
-        current_page: pagy.page,
-        per_page: pagy.vars[:items],
-        total_count: pagy.count,
-        total_pages: pagy.pages
-      }
-    }
+      format.csv do
+        Rails.logger.debug "[DEBUG] Entrou no format.csv"
+
+        headers["Content-Disposition"] = "attachment; filename=despesas.csv"
+        headers["Content-Type"] ||= "text/csv"
+        render plain: expenses_to_csv(expenses)
+      end
+    end
   end
 
   def create
@@ -70,5 +83,20 @@ class ExpensesController < ApplicationController
 
   def expense_params
     params.permit(:description, :amount, :category, :expense_date)
+  end
+
+  def expenses_to_csv(expenses)
+    CSV.generate(headers: true) do |csv|
+      csv << [ "Descrição", "Valor", "Categoria", "Data" ]
+
+      expenses.each do |expense|
+        csv << [
+          expense.description,
+          expense.amount,
+          expense.category,
+          expense.expense_date
+        ]
+      end
+    end
   end
 end
