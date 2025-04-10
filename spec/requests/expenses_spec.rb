@@ -17,7 +17,7 @@ RSpec.describe "Expenses", type: :request do
       end
 
       it "retorna todas as despesas do usuário logado" do
-        get "/expenses"
+        get "/expenses", headers: { "Accept" => "application/json" }
 
         expect(response).to have_http_status(:ok)
         descriptions = response.parsed_body["data"].map { |e| e["description"] }
@@ -33,7 +33,7 @@ RSpec.describe "Expenses", type: :request do
       end
 
       it "retorna apenas despesas dentro do intervalo" do
-        get "/expenses", params: { start_date: "2025-03-01", end_date: "2025-03-31" }
+        get "/expenses", params: { start_date: "2025-03-01", end_date: "2025-03-31" }, headers: { "Accept" => "application/json" }
 
         expect(response).to have_http_status(:ok)
         descriptions = response.parsed_body["data"].map { |e| e["description"] }
@@ -48,7 +48,7 @@ RSpec.describe "Expenses", type: :request do
       end
 
       it "retorna apenas despesas da categoria informada" do
-        get "/expenses", params: { category: "Transporte" }
+        get "/expenses", params: { category: "Transporte" }, headers: { "Accept" => "application/json" }
 
         expect(response).to have_http_status(:ok)
         descriptions = response.parsed_body["data"].map { |e| e["description"] }
@@ -64,7 +64,7 @@ RSpec.describe "Expenses", type: :request do
       end
 
       it "retorna apenas despesas do mês especificado" do
-        get "/expenses", params: { month: "2025-03" }
+        get "/expenses", params: { month: "2025-03" }, headers: { "Accept" => "application/json" }
 
         expect(response).to have_http_status(:ok)
         descriptions = response.parsed_body["data"].map { |e| e["description"] }
