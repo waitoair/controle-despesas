@@ -41,8 +41,6 @@ class ExpensesController < ApplicationController
       end
 
       format.csv do
-        Rails.logger.debug "[DEBUG] Entrou no format.csv"
-
         headers["Content-Disposition"] = "attachment; filename=despesas.csv"
         headers["Content-Type"] ||= "text/csv"
         render plain: expenses_to_csv(expenses)
